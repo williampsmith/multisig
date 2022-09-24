@@ -25,6 +25,9 @@ contract MultiSigWallet {
     event Revoke(address indexed owner, uint indexed txId);
     // excute a transaction only if we have enough signatures
     event Execute(uint indexed txId);
+    // generally good practice for sending logging data to a client that
+    // is not covered by any of the above events
+    event Log(string message);
 
     // note that we need to store the array of owners separately from the mapping,
     // as solidity mappings have all possible keys, and we cannot (nor should we) iterate
@@ -95,13 +98,20 @@ contract MultiSigWallet {
     }
 
     // NOTE: receive is a keyword in solidity functions. It is used to define a 
-    // fallback function to simply receive ether. The function signature must 
-    // always be as shown here
+    // fallback function to simply receive ether without calling data, e.g. 
+    //     address.call{value: 100}()
+    // The function signature must always be as shown here
     receive() external payable {
         emit Deposit({
             sender: msg.sender, 
             amount: msg.value
         });
+    }
+
+    // NOTE: fallback is a special function that will match any `call` 
+    // with a signature that does not match any existing function.
+    fallback() external payable {
+        emit Log("Fallback function was called");
     }
 
     function submit(address _to, uint _value, bytes calldata _data) 
