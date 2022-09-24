@@ -1,0 +1,28 @@
+{
+  "name": "multisig",
+  "version": "1.0.0",
+  "description": "Simple ethereum based multisig wallet",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williampsmith/multisig.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/williampsmith/multisig/issues"
+  },
+  "homepage": "https://github.com/williampsmith/multisig#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "ethers": "^5.7.1",
+    "hardhat": "^2.11.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.2"
+  }
+}
