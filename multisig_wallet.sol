@@ -6,6 +6,13 @@ pragma solidity ^0.8.10;
  * @title MultiSigWallet
  * @dev Wallet that requires signature of multiole owners for submitting transactions
  * @custom:dev-run-script ./scripts/deploy_with_ethers.ts
+ *
+ * NOTE: in this wallet implementation, we need to first call the contract and send eth to deposit.
+ * This will execute receive(). Then after the wei is deposited, we can later call execute() to execute 
+ * the transaction after it has the requisite amount of signatures.
+ * Alternatively, we could have made execute() payable directly, however this would require that a single
+ * party pay the total amount for executing the transaction rather than allowing for multiple parties, for
+ * example, each owner, to deposit part of the transaction value.
  */
 contract MultiSigWallet {
     // deposit eth into contract account
@@ -135,7 +142,18 @@ contract MultiSigWallet {
             hasEnoughApprovals(_txId) {
         Transaction storage transaction = transactions[_txId];
         transaction.executed = true;
-        (bool success, ) = transaction.to.call{value: transaction.value}(transaction.data);
+        (
+            bool success, 
+            // bytes memory data // serialized data that is returned from the function
+        ) = transaction.to.call{
+            value: transaction.value // amount of wei to send to contract
+            // gas: <gas amount>
+        }(
+            // transaction.data is bytes that can be generated from calling, for example:
+            // abi.encodeWithSignature(<signature>, <arg1>, <arg2>, ...);
+            // for example: abi.encodeWithSignature("foo(string, uint256)", "some string arg", 123);
+            transaction.data
+        );
         require(success, "Transaction failed");
         emit Execute(_txId);
     }
